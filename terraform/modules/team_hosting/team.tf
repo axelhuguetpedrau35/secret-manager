@@ -3,7 +3,7 @@ variable "mount_path" {
 }
 
 locals {
-  team_name = "hosting"
+  team_name = "teamB"
 }
 
 resource "vault_policy" "team_policy" {
