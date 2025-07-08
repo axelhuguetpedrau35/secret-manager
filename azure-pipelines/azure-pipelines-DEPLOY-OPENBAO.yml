@@ -8,7 +8,7 @@ trigger:
       - main
   paths:
     include:
-      - BT-INFISICAL-01 - _ ssh_/*
+      - VM-1*
 
 pool:
   name: "On Premise - BT-INFRA - LINUX"
@@ -27,4 +27,4 @@ steps:
 - task: PublishPipelineArtifact@1
   inputs:
     targetPath: '$(Build.ArtifactStagingDirectory)'
-    artifact: MajHostingScripts1
+    artifact: Majkubernetes1
