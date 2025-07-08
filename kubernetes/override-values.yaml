@@ -1,0 +1,66 @@
+global:
+  enabled: true
+  tlsDisable: true  # Pas de TLS, accès en HTTP
+
+server:
+  image:
+    repository: "openbao/openbao"
+    tag: "latest"
+  dataStorage:
+    enabled: true
+    size: 5Gi
+    mountPath: "/vault/data"
+    storageClass: null
+    accessMode: ReadWriteOnce
+  auditStorage:
+    enabled: true
+    size: 5Gi
+    mountPath: "/vault/audit"
+    storageClass: null
+    accessMode: ReadWriteOnce
+
+  standalone:
+    enabled: false
+
+  ha:
+    enabled: true
+    replicas: 1
+    raft:
+      enabled: true
+      setNodeId: true
+      config: |
+        ui = true
+        listener "tcp" {
+          address = "[::]:8500"
+          cluster_address = "[::]:8501"
+          tls_disable = true
+        }
+        storage "raft" {
+          path = "/vault/data"
+          retry_join {
+            leader_api_addr = "http://openbao-0.openbao-internal:8500"
+          }
+        }
+        service_registration "kubernetes" {}
+
+  readinessProbe:
+    enabled: true
+    scheme: HTTP
+    port: 8500
+    path: "/v1/sys/health?standbyok=true&sealedcode=204&uninitcode=204"
+
+  service:
+    enabled: true
+    port: 8500
+    targetPort: 8500
+    clusterPort: 8501
+    clusterTargetPort: 8501
+
+# Activer directement en ligne de commande donc ne pas se réferer à ce port là
+ui:
+  enabled: true
+  serviceType: NodePort
+  servicePort: 8500
+  externalPort: 8500
+  targetPort: 8500
+  nodePort: 32123  # Accès via <IP_VM>:32123
