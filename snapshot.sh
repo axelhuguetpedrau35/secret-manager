@@ -2,9 +2,9 @@
 
 POD_NAME="openbao-vault-0"
 NAMESPACE="openbao"
-SNAPSHOT_DIR="/home/btadmin/openbao/openbao-snapshots"
+SNAPSHOT_DIR="/home/openbao/openbao-snapshots"
 SNAPSHOT_FILE="openbao-$(date +%F_%H-%M-%S).snap"
-VAULT_TOKEN="s.nhb2MnUvjomgprA1TfZP2VMV"
+VAULT_TOKEN="fake_token"
 
 echo "[INFO] Création du snapshot depuis le pod $POD_NAME..."
 
