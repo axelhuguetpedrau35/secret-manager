@@ -8,12 +8,12 @@ terraform {
 }
 
 provider "vault" {
-  address      = "http://10.201.201.206:31823"
+  address      = "http://<ip>:32123"
   token        = var.vault_token
 }
 
 # Mounts KV par équipe
-resource "vault_mount" "cyber_kv" {
+resource "vault_mount" "teamA_kv" {
   path        = "cyber"
   type        = "kv"
   description = "KV engine for Cyber team"
@@ -22,7 +22,7 @@ resource "vault_mount" "cyber_kv" {
   }
 }
 
-resource "vault_mount" "hosting_kv" {
+resource "vault_mount" "teamB_kv" {
   path        = "hosting"
   type        = "kv"
   description = "KV engine for Hosting team"
@@ -31,7 +31,7 @@ resource "vault_mount" "hosting_kv" {
   }
 }
 
-resource "vault_mount" "reseaux_kv" {
+resource "vault_mount" "teamC_kv" {
   path        = "reseaux"
   type        = "kv"
   description = "KV engine for Reseaux team"
@@ -41,7 +41,7 @@ resource "vault_mount" "reseaux_kv" {
 }
 
 # Secrets initiaux (test)
-resource "vault_kv_secret_v2" "cyber_secret" {
+resource "vault_kv_secret_v2" "teamA_secret" {
   mount     = vault_mount.cyber_kv.path
   name      = "cybertest"
   data_json = jsonencode({
@@ -50,7 +50,7 @@ resource "vault_kv_secret_v2" "cyber_secret" {
   cas = 1
 }
 
-resource "vault_kv_secret_v2" "hosting_secret" {
+resource "vault_kv_secret_v2" "teamB_secret" {
   mount     = vault_mount.hosting_kv.path
   name      = "hostingtest"
   data_json = jsonencode({
@@ -59,7 +59,7 @@ resource "vault_kv_secret_v2" "hosting_secret" {
   cas = 1
 }
 
-resource "vault_kv_secret_v2" "reseaux_secret" {
+resource "vault_kv_secret_v2" "teamC_secret" {
   mount     = vault_mount.reseaux_kv.path
   name      = "reseauxtest"
   data_json = jsonencode({
@@ -70,39 +70,39 @@ resource "vault_kv_secret_v2" "reseaux_secret" {
 
 # Modules des trois équipes
 module "cyber_team" {
-  source     = "./modules/team_cyber"
+  source     = "./modules/teamA"
   mount_path = vault_mount.cyber_kv.path
 }
 
 module "hosting_team" {
-  source     = "./modules/team_hosting"
+  source     = "./modules/teamB"
   mount_path = vault_mount.hosting_kv.path
 }
 
 module "reseaux_team" {
-  source     = "./modules/team_reseaux"
+  source     = "./modules/teamC"
   mount_path = vault_mount.reseaux_kv.path
 }
 
 # Outputs pour automatisation (récup AppRole)
-output "cyber_role_id" {
-  value = module.cyber_team.role_id
+output "teamA_role_id" {
+  value = module.teamA.role_id
 }
-output "cyber_secret_id" {
-  value     = module.cyber_team.secret_id
+output "teamA_secret_id" {
+  value     = module.teamA.secret_id
   sensitive = true
 }
-output "hosting_role_id" {
+output "teamB_role_id" {
   value = module.hosting_team.role_id
 }
-output "hosting_secret_id" {
-  value     = module.hosting_team.secret_id
+output "teamB_secret_id" {
+  value     = module.teamB.secret_id
   sensitive = true
 }
-output "reseaux_role_id" {
-  value = module.reseaux_team.role_id
+output "teamC_role_id" {
+  value = module.teamC.role_id
 }
-output "reseaux_secret_id" {
-  value     = module.reseaux_team.secret_id
+output "teamC_secret_id" {
+  value     = module.teamC.secret_id
   sensitive = true
 }
